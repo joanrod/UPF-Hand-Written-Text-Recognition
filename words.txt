@@ -1,0 +1,16 @@
+sub-sub-0 154 0 0 159 196 NN la
+sub-sub-1 154 0 0 236 168 NN que
+sub-sub-2 154 0 0 208 138 NN tio
+sub-sub-3 154 0 0 96 103 NN bi
+sub-sub-4 154 0 0 103 60 NN m
+sub-sub-5 154 0 0 33 169 NN l
+sub-sub-6 154 0 0 66 116 NN y
+sub-sub-7 154 0 0 92 91 NN o
+sub-sub-8 154 0 0 93 117 NN y
+sub-sub-9 154 0 0 156 86 NN en
+sub-sub-10 154 0 0 138 195 NN ho
+sub-sub-11 154 0 0 104 100 NN es
+sub-sub-12 154 0 0 34 122 NN t
+sub-sub-13 154 0 0 158 137 NN al
+sub-sub-14 154 0 0 84 88 NN a
+sub-sub-15 154 0 0 76 122 NN s
