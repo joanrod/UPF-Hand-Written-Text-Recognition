@@ -1,3 +1,5 @@
+from operator import itemgetter
+
 import math
 import cv2
 import numpy as np
@@ -100,11 +102,14 @@ def startWordSegmentation(image_path):
         print("Directory " , out_dir ,  " already exists")
     print( os.listdir(out_dir))
 
-    cleanFolder(out_dir)
+    #cleanFolder(out_dir)
 
     #Create input image directory
     image = cv2.imread(image_path)
 
+    dictCoords ={}
+    dictImages = {}
+    matrix = []
     #Iterate to find all the words
     id = 0
     if image is not None:
@@ -118,17 +123,71 @@ def startWordSegmentation(image_path):
         #run all segments
         for (j, w) in enumerate(res):
             (wordBox, wordImg) = w
-            (x, y, w, h) = wordBox
+            dictCoords[id] = wordBox
+            dictImages[id] = wordImg
+            [x,y,w,h] = wordBox
+            matrix.append([x,y,w,h,id])
 
-            name = '/r07-000-00-%02d.png' % id
-
-            print(name, ' - ', wordBox)
-            cv2.imwrite(out_dir + name, wordImg)  # save word
-            #print('new image created', name)
             id += 1
+
+        # Set order of the words: Compute depending on bounding box coordinates
+        dictOrder = orderBBoxes(matrix)
+        print('hello')
+        for id in dictOrder.keys():
+            saveWord(out_dir, dictImages.get(id), dictOrder.get(id))
+
+
+
     elif image is None:
         print("Error loading image")
         # end this loop iteration and move on to next image
+    print(matrix)
+
+def orderBBoxes(matrix):
+    #Order y in ascending
+    matrix = sorted(matrix, key=itemgetter(1))
+    tempMatrix = []
+
+
+    initBox = matrix[0]
+    currentOrder = 0
+    currentY1 = 0
+    currentY2 = (initBox[1] + initBox[3]) * 1.3
+    dictOrd = {}
+    maxX = max(matrix, key=itemgetter(0))
+    maxX = maxX[0]
+    maxY = max(matrix, key=itemgetter(1))
+    maxY = maxY[1]
+
+
+    l2 = len(matrix)
+    while len(dictOrd) != len(matrix):
+        l1 = len(dictOrd)
+        for row in matrix:
+            if dictOrd.get(row[4]) == None:
+                x = row[0]
+                y = row[1]
+                #if the box is in the range
+                if row[0] <= maxX and row[1]>=currentY1 and row[1]<=currentY2:
+                    tempMatrix.append(row)
+                elif currentY2 != maxY:
+                    tempMatrix = sorted(tempMatrix, key=itemgetter(0))
+                    currentY1 = row[1]
+                    currentY2 = row[1] + row[3]
+                    for row in tempMatrix:
+                        dictOrd[row[4]] = currentOrder
+                        currentOrder += 1
+                    tempMatrix = []
+                    break
+    return dictOrd
+
+
+
+
+def saveWord(out_dir, wordImg, id):
+
+    name = '/r07-000-00-%02d.png' % id
+    cv2.imwrite(out_dir + name, wordImg)  # save word
 
 def cleanFolder(mydir):
 
@@ -137,3 +196,12 @@ def cleanFolder(mydir):
         os.remove(os.path.join(mydir, f))
         print('folder is clean')
 
+def toCoordinates(bbox):
+    rect = np.zeros((4, 2), dtype="float32")
+
+    rect[0] = [bbox[0], bbox[1]]
+    rect[1] = [bbox[0] + bbox[2], bbox[1]]
+    rect[2] = [bbox[0], bbox[1] + bbox[3]]
+    rect[3] = [bbox[0] + bbox[2], bbox[1] + bbox[3]]
+
+    return rect
