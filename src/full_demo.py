@@ -15,9 +15,9 @@ import numpy as np
 from main import FilePaths
 import tensorflow as tf
 from Model import Model
-from WordSegmentation import wordSegmentation, prepareImg
+from WordSegmentation import wordSegmentation, prepareImg, startWordSegmentation, cleanFolder
 from main import train, validate
-
+import os
 
 decoderType = DecoderType.WordBeamSearch
 
@@ -30,21 +30,29 @@ open(FilePaths.fnCharList, 'w').write(str().join(loader.charList))
 # save words contained in dataset into file
 open(FilePaths.fnCorpus, 'w').write(str(' ').join(loader.trainWords + loader.validationWords))
 
+
+"""  
 # execute training or validation
 tf.reset_default_graph()
-model = Model(loader.charList, decoderType)
 
+#Load the model
+model = Model(loader.charList, decoderType)
+"""
+#Read the image that has all the text
+pathScannedSentences = '../data/sentences/test_scanned.png'
 outputWords = "../data/sentences/tempScanedPictures"
 
-#Image 1 (diamonds)
-image = cv2.imread((outputWords + '/r07-000-00-02.png'), cv2.IMREAD_GRAYSCALE)
+#Start the segmentation and store the words in the temp folder
+startWordSegmentation(pathScannedSentences)
+"""
+#Run all the files in folder and infer
+for im_path in os.listdir(outputWords):
+    im = cv2.imread(outputWords + im_path, cv2.IMREAD_GRAYSCALE)
+    wordImg = preprocess(im, Model.imgSize)
 
 
-wordImg = preprocess(image, Model.imgSize)
-batch = Batch(None, [wordImg])
-(recognized, probability) = model.inferBatch(batch, True)
+    batch = Batch(None, [wordImg])
+    (recognized, probability) = model.inferBatch(batch, True)
 
-print('Recognized:', '"' + recognized[0] + '"')
-print('Probability:', probability[0])
-
-
+    print(recognized[0], ' ')
+"""

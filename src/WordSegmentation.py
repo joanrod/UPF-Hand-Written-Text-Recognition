@@ -1,6 +1,7 @@
 import math
 import cv2
 import numpy as np
+import os
 
 
 def wordSegmentation(img, kernelSize=25, sigma=11, theta=7, minArea=0, maxArea = 120000):
@@ -60,7 +61,7 @@ def prepareImg(img, height):
 
 
 def createKernel(kernelSize, sigma, theta):
-    """create anisotropic filter kernel according to given parameters"""
+    """create an isotropic filter kernel according to given parameters"""
     assert kernelSize % 2  # must be odd size
     halfSize = kernelSize // 2
 
@@ -81,3 +82,58 @@ def createKernel(kernelSize, sigma, theta):
 
     kernel = kernel / np.sum(kernel)
     return kernel
+
+def create_dir(name):
+    if not os.path.exists(name):
+        os.makedirs(name)
+
+def startWordSegmentation(image_path):
+
+    print(image_path);
+    #Create output temp directory
+    out_dir = "../data/sentences/tempScanedPictures/"
+
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
+        print("Directory " , out_dir ,  " Created ")
+    else:
+        print("Directory " , out_dir ,  " already exists")
+    print( os.listdir(out_dir))
+
+    cleanFolder(out_dir)
+
+    #Create input image directory
+    image = cv2.imread(image_path)
+
+    #Iterate to find all the words
+    id = 0
+    if image is not None:
+        print("Image loaded")
+
+        #Single channel image
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        #segmentation
+        res = wordSegmentation(image, kernelSize=55, sigma=150, theta=11, minArea=5000)
+
+        #run all segments
+        for (j, w) in enumerate(res):
+            (wordBox, wordImg) = w
+            (x, y, w, h) = wordBox
+
+            name = '/r07-000-00-%02d.png' % id
+
+            print(name, ' - ', wordBox)
+            cv2.imwrite(out_dir + name, wordImg)  # save word
+            #print('new image created', name)
+            id += 1
+    elif image is None:
+        print("Error loading image")
+        # end this loop iteration and move on to next image
+
+def cleanFolder(mydir):
+
+    filelist = [f for f in os.listdir(mydir)]
+    for f in filelist:
+        os.remove(os.path.join(mydir, f))
+        print('folder is clean')
+
