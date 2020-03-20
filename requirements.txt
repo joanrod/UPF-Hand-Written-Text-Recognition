@@ -39,12 +39,9 @@ requests-oauthlib==1.2.0
 rsa==4.0
 six==1.12.0
 subprocess32==3.5.4
-tb-nightly==2.1.0a20191101
 tensorboard==1.12.2
 tensorflow==1.12.0
 termcolor==1.1.0
-tf-estimator-nightly==2.0.0.dev2019110108
-tf-nightly==2.1.0.dev20191101
 urllib3==1.25.6
 Werkzeug==0.15.2
 wrapt==1.11.2
