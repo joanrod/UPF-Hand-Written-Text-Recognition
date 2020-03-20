@@ -158,9 +158,10 @@ def orderBBoxes(matrix):
     maxX = maxX[0]
     maxY = max(matrix, key=itemgetter(1))
     maxY = maxY[1]
-
-
+    nWords = len(matrix)
+    currentWords = 0
     l2 = len(matrix)
+
     while len(dictOrd) != len(matrix):
         l1 = len(dictOrd)
         for row in matrix:
@@ -168,8 +169,9 @@ def orderBBoxes(matrix):
                 x = row[0]
                 y = row[1]
                 #if the box is in the range
-                if row[0] <= maxX and row[1]>=currentY1 and row[1]<=currentY2:
+                if (row[0] <= maxX and row[1]>=currentY1 and row[1]<=currentY2 and currentWords != nWords) :
                     tempMatrix.append(row)
+                    currentWords += 1
                 elif currentY2 != maxY:
                     tempMatrix = sorted(tempMatrix, key=itemgetter(0))
                     currentY1 = row[1]
@@ -185,7 +187,6 @@ def orderBBoxes(matrix):
 
 
 def saveWord(out_dir, wordImg, id):
-
     name = '/r07-000-00-%02d.png' % id
     cv2.imwrite(out_dir + name, wordImg)  # save word
 
